@@ -46,9 +46,9 @@ library(kableExtra)
 #------------------READ IN DATA--------------
 
 # read in 
-hate.df <- read.csv("hate_study2.csv")
+hate <- read_csv("hate_study2.csv")
 # convert to local data frame
-hate.df <- tibble::as_tibble(hate.df)
+hate.df <- tibble::as_tibble(hate)
 
 #------------------FORMATTING--------------
 
@@ -87,5 +87,14 @@ levels(hate.df$topic.control)
 
 hate.df = hate.df %>% 
   mutate(
-    topic = coalesce(topic.control, topic.realistic, topic.symbolic)
+    topic = coalesce(topic.control, topic.realistic, topic.symbolic), # create condition column
+    anger.total = (anger1 + anger2 + anger3 + anger4)/4, #sub-scale total
+    contempt.total = (contempt1 + contempt2 + contempt3 + contempt4)/4,
+    disgust.total = (disgust1 + disgust2 + disgust3 + disgust4)/4,
+    hate.total = round( #anger scale total
+      (anger1 + anger2 + anger3 + anger4 + 
+         contempt1 + contempt2 + contempt3 + contempt4 + 
+         disgust1 + disgust2 + disgust3 + disgust4)/12, digits = 2)
   )
+
+
