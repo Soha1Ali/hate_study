@@ -192,5 +192,106 @@ hate.df <- hate.df %>%
 hate.df <- hate.df %>% 
   select(1:6, 73, 12, 13, 74, 17, 18, 75:79, 82) 
 
+# truthfulness check
+
+hate.df %>%
+  filter(truthfulness == "No")
+
+# how many per condition
+
+hate.df %>%
+  count(condition, topic)
+
+#------------------CALCULATIONS--------------
+
+# descriptives
+
+hate.df %>%
+  summarise(n=n(),
+            age_mean=mean(age),
+            age_sd=sd(age)) 
+
+# -------realistic threats-------
+
+m.checks.descriptives <- hate.df %>% 
+  group_by(condition) %>%
+  get_summary_stats(mcheck1, mcheck2, type ="mean_sd") %>% 
+  print()
+
+violon.realistic <- hate.df %>% 
+  select(mcheck1, mcheck2, condition) %>%
+  gather(key="check", value="val", -condition) %>%
+  filter(condition=="realistic") %>%
+  ggplot(aes(x=check, y=val)) +
+  geom_violin(fill="lightblue") +
+  stat_summary(fun=mean, geom ="point", col="red")
+
+violon.symbolilc <- hate.df %>% 
+  select(mcheck1, mcheck2, condition) %>%
+  gather(key="check", value="val", -condition) %>%
+  filter(condition=="symbolic") %>%
+  ggplot(aes(x=check, y=val)) +
+  geom_violin(fill="lightblue") +
+  stat_summary(fun=mean, geom ="point", col="red")
+
+violon.control <- hate.df %>% 
+  select(mcheck1, mcheck2, condition) %>%
+  gather(key="check", value="val", -condition) %>%
+  filter(condition=="control") %>%
+  ggplot(aes(x=check, y=val)) +
+  geom_violin(fill="lightblue") +
+  stat_summary(fun=mean, geom ="point", col="red")
+
+# compare mcheck1 to mcheck2 with paired t-test
+
+m.checks.realistic <- hate.df %>% 
+  filter(condition=="realistic") %>% 
+  select(mcheck1, mcheck2) %>%
+  gather(key="check", value="val", mcheck1, mcheck2) %>%
+  t_test(val ~ check, paired=TRUE, detailed=TRUE) %>%
+  add_significance() %>%
+  print()
+
+m.checks.realistic.d <- hate.df %>% 
+  filter(condition=="realistic") %>% 
+  select(mcheck1, mcheck2) %>%
+  gather(key="check", value="val", mcheck1, mcheck2) %>%
+  rstatix::cohens_d(val ~ check, paired=TRUE) %>%
+  print()
+
+# -------symbolic threats-------
+
+m.checks.symbolic <- hate.df %>% 
+  filter(condition=="symbolic") %>% 
+  select(mcheck1, mcheck2) %>%
+  gather(key="check", value="val", mcheck1, mcheck2) %>%
+  t_test(val ~ check, paired=TRUE, detailed=TRUE) %>%
+  add_significance() %>%
+  print()
+
+m.checks.symbolic.d <- hate.df %>% 
+  filter(condition=="symbolic") %>% 
+  select(mcheck1, mcheck2) %>%
+  gather(key="check", value="val", mcheck1, mcheck2) %>%
+  rstatix::cohens_d(val ~ check, paired=TRUE) %>%
+  print()
+
+# -------control group-------
+
+m.checks.control <- hate.df %>% 
+  filter(condition=="control") %>% 
+  select(mcheck1, mcheck2) %>%
+  gather(key="check", value="val", mcheck1, mcheck2) %>%
+  t_test(val ~ check, paired=TRUE, detailed=TRUE) %>%
+  add_significance() %>%
+  print()
+
+m.checks.control.d <- hate.df %>% 
+  filter(condition=="control") %>% 
+  select(mcheck1, mcheck2) %>%
+  gather(key="check", value="val", mcheck1, mcheck2) %>%
+  rstatix::cohens_d(val ~ check, paired=TRUE) %>%
+  print()
+
 
 
