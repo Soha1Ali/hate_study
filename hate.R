@@ -218,32 +218,6 @@ m.checks.descriptives <- hate.df %>%
   get_summary_stats(mcheck1, mcheck2, type ="mean_sd") %>% 
   print()
 
-violon.realistic <- hate.df %>% 
-  select(mcheck1, mcheck2, condition) %>%
-  gather(key="check", value="val", -condition) %>%
-  filter(condition=="realistic") %>%
-  ggplot(aes(x=check, y=val)) +
-  geom_violin(fill="lightblue") +
-  stat_summary(fun=mean, geom ="point", col="red")
-
-violon.symbolilc <- hate.df %>% 
-  select(mcheck1, mcheck2, condition) %>%
-  gather(key="check", value="val", -condition) %>%
-  filter(condition=="symbolic") %>%
-  ggplot(aes(x=check, y=val)) +
-  geom_violin(fill="lightblue") +
-  stat_summary(fun=mean, geom ="point", col="red")
-
-violon.control <- hate.df %>% 
-  select(mcheck1, mcheck2, condition) %>%
-  gather(key="check", value="val", -condition) %>%
-  filter(condition=="control") %>%
-  ggplot(aes(x=check, y=val)) +
-  geom_violin(fill="lightblue") +
-  stat_summary(fun=mean, geom ="point", col="red")
-
-# compare mcheck1 to mcheck2 with paired t-test
-
 m.checks.realistic <- hate.df %>% 
   filter(condition=="realistic") %>% 
   select(mcheck1, mcheck2) %>%
@@ -258,6 +232,14 @@ m.checks.realistic.d <- hate.df %>%
   gather(key="check", value="val", mcheck1, mcheck2) %>%
   rstatix::cohens_d(val ~ check, paired=TRUE) %>%
   print()
+
+violon.realistic <- hate.df %>% 
+  select(mcheck1, mcheck2, condition) %>%
+  gather(key="check", value="val", -condition) %>%
+  filter(condition=="realistic") %>%
+  ggplot(aes(x=check, y=val)) +
+  geom_violin(fill="lightblue") +
+  stat_summary(fun=mean, geom ="point", col="red")
 
 # -------symbolic threats-------
 
@@ -276,6 +258,14 @@ m.checks.symbolic.d <- hate.df %>%
   rstatix::cohens_d(val ~ check, paired=TRUE) %>%
   print()
 
+violon.symbolilc <- hate.df %>% 
+  select(mcheck1, mcheck2, condition) %>%
+  gather(key="check", value="val", -condition) %>%
+  filter(condition=="symbolic") %>%
+  ggplot(aes(x=check, y=val)) +
+  geom_violin(fill="lightblue") +
+  stat_summary(fun=mean, geom ="point", col="red")
+
 # -------control group-------
 
 m.checks.control <- hate.df %>% 
@@ -293,5 +283,25 @@ m.checks.control.d <- hate.df %>%
   rstatix::cohens_d(val ~ check, paired=TRUE) %>%
   print()
 
+violon.control <- hate.df %>% 
+  select(mcheck1, mcheck2, condition) %>%
+  gather(key="check", value="val", -condition) %>%
+  filter(condition=="control") %>%
+  ggplot(aes(x=check, y=val)) +
+  geom_violin(fill="lightblue") +
+  stat_summary(fun=mean, geom ="point", col="red")
 
+# effects of threat perceptions on hate 
+
+hate.model <- lm(hate.total ~ condition, data=hate.df)
+summary.hate.model <- summary(hate.model)
+tab_model(hate.model,
+          show.se=T,
+          title="hate predicted by threat perceptions")
+
+
+ggplot(hate.df, aes(x=condition, y=anger.total)) +
+  geom_boxplot() + 
+  geom_jitter(color="purple", alpha=.3) +
+  stat_summary(fun=mean, geom ="point", col="red")
 
