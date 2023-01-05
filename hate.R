@@ -293,15 +293,25 @@ violon.control <- hate.df %>%
 
 # effects of threat perceptions on hate 
 
+# idk what this is
 hate.model <- lm(hate.total ~ condition, data=hate.df)
 summary.hate.model <- summary(hate.model)
 tab_model(hate.model,
           show.se=T,
           title="hate predicted by threat perceptions")
 
+anote.hate <- anova(hate.model)
+anove.hate.tbl <- anova.hate %>%
+  broom::tidy()
+cohens_f(anova.hate, partial=F, ci=0.95)
 
 ggplot(hate.df, aes(x=condition, y=anger.total)) +
-  geom_boxplot() + 
-  geom_jitter(color="purple", alpha=.3) +
+  geom_violin() + 
   stat_summary(fun=mean, geom ="point", col="red")
+
+
+m.checks.descriptives <- hate.df %>% 
+  group_by(condition) %>%
+  get_summary_stats(hate.total, type ="mean_sd") %>% 
+  print()
 
